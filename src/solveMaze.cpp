@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include "maze.h"
+#include "maze.hpp"
 using namespace std;
 
 int main(int argc, char* argv[])

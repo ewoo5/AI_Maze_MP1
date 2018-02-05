@@ -7,8 +7,10 @@ LDIR=../lib
 
 LIBS=-lm
 
-DEPS=$(patsubst %,$(IDIR)/%.hpp)
-OBJ=$(patsubst %,$(ODIR)/%.o)
+_OBJ=solveMaze.o maze.o
+_DEPS=maze.hpp
+DEPS=$(patsubst %,$(IDIR)/%,$(_DEPS))
+OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
 
 $(ODIR)/%.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(FLAGS)
