@@ -1,6 +1,6 @@
 IDIR=../include
 CC=g++
-FLAGS=-I$(IDIR)
+FLAGS=-I$(IDIR) -std=c++11
 
 ODIR=obj
 LDIR=../lib

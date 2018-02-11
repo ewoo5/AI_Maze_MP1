@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	cout<<"f_x:"<<inputMaze.f_x.front()<<'\n';
 	cout<<"f_y:"<<inputMaze.f_y.front()<<'\n';
 
-	inputMaze.bfs();
+	inputMaze.greedy();
 	inputMaze.printMaze();
 
 	mazeText.close();
