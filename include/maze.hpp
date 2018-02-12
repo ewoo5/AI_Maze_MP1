@@ -62,6 +62,20 @@ class maze{
 				int man_dist(box * first, box * second);
 		};
 	
+		class astar_man_dist{
+			public:
+				int  dest_x, dest_y;
+				box ** map_copy;
+				astar_man_dist(){
+					dest_x = 0; dest_y = 0; map_copy = NULL;
+				}
+				astar_man_dist(int x, int y, box ** in_map){
+					dest_x = x; dest_y = y; this->map_copy = in_map;
+				}
+				bool operator()(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs);
+				//bool operator==(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs);
+		};
+	
 	private:
 		int check_right(box * current);
 		int check_left(box * current);

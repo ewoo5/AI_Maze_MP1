@@ -170,6 +170,14 @@ void maze::dfs(){
 		b_lifo.pop();
 	}
 
+	for(int a = 0; a < width; a++){
+		for(int b = 0; b < length; b++){
+			if(map[a][b].from != NULL){
+				map[a][b].element = '#';
+			}
+		}
+	}
+	
 	current = &(this->map[this->f_y.front()][this->f_x.front()]);
 	while(current->from != NULL){
 		current->element = '.';
@@ -182,77 +190,89 @@ void maze::astar(){
 
 	int x, y;
 	box * current = &(map[p_y.front()][p_x.front()]);
-	std::map<std::pair<int, int>, box*, astar_man_dist> neighbors (astar_man_dist(current->x, current->y, this->map)); 
+	std::map<std::pair<int, int>, box*, astar_man_dist> neighbors (astar_man_dist(f_x.front(), f_y.front(), this->map)); 
 	std::pair<int, int> xy_pair(p_x.front(), p_y.front());
 	current->curr_dist = 0;
 	neighbors[xy_pair] = current;
 
 	while(!neighbors.empty()){
-		cout<<"hi";
 		//call helper?
 		std::map<std::pair<int, int>, box*>::iterator it = neighbors.begin();
 		current = it->second;
-		x = it->first.first; y = it->first.second;
+		x = current->x; y = current->y;
 		if( (x == f_x.front()) && (y == f_y.front())){
 			break;
 		}
 
+		map[current->y][current->x].visited = true;
+		xy_pair = std::pair<int, int>(current->x, current->y);
+		neighbors.erase(xy_pair);
+	
 		// NOTE: check mechanism to see if something is already in map, otherwise take it out and replace it.
 		if(check_right(current)){
 			if(map[current->y][current->x + 1].curr_dist > (map[current->y][current->x].curr_dist + 1)){
+				neighbors.erase(std::pair<int,int>(current->x + 1, current->y));
 				map[current->y][current->x + 1].curr_dist = (map[current->y][current->x].curr_dist + 1);
 				map[current->y][current->x + 1].from = current;
 			}
-			xy_pair = std::make_pair(current->x+1, current->y);
-			it = neighbors.find(xy_pair);
-			if(it != neighbors.end()){
-				neighbors.erase(xy_pair);
-			}
-			neighbors[xy_pair] = &map[current->y][current->x + 1];
+			xy_pair = std::pair<int, int>(current->x + 1, current->y);
+			//cout<<"("<<xy_pair.first<<","<<xy_pair.second<<")";
+			std::pair<std::map<std::pair<int,int>,box*>::iterator, bool> insert_check  = neighbors.insert(std::pair<std::pair<int,int>,box*>(xy_pair, &(map[current->y][current->x + 1])));
+			if(insert_check.second == false){
+				//cout<<"Fail!\n";
+			}//else{cout<<"\n";}
 		}
 
 		if(check_left(current)){
 			if(map[current->y][current->x - 1].curr_dist > (map[current->y][current->x].curr_dist + 1)){
+				neighbors.erase(std::pair<int,int>(current->x - 1, current->y));
 				map[current->y][current->x - 1].curr_dist = (map[current->y][current->x].curr_dist + 1);
 				map[current->y][current->x - 1].from = current;
 			}
-			xy_pair = std::make_pair(current->x - 1, current->y);
-			it = neighbors.find(xy_pair);
-			if(it != neighbors.end()){
-				neighbors.erase(xy_pair);
-			}
-			neighbors[xy_pair] = &map[current->y][current->x - 1];
+			xy_pair = std::pair<int, int>(current->x - 1, current->y);
+			//cout<<"("<<xy_pair.first<<","<<xy_pair.second<<")";
+			std::pair<std::map<std::pair<int,int>,box*>::iterator, bool> insert_check  = neighbors.insert(std::pair<std::pair<int,int>,box*>(xy_pair, &(map[current->y][current->x - 1])));
+			if(insert_check.second == false){
+				//cout<<"Fail!\n";
+			}//else{cout<<"\n";}
 		}
 
 		if(check_down(current)){
 			if(map[current->y + 1][current->x].curr_dist > (map[current->y][current->x].curr_dist + 1)){
+				neighbors.erase(std::pair<int,int>(current->x, current->y + 1));
 				map[current->y + 1][current->x].curr_dist = (map[current->y][current->x].curr_dist + 1);
 				map[current->y + 1][current->x].from = current;
 			}
-			xy_pair = std::make_pair(current->x, current->y + 1);
-			it = neighbors.find(xy_pair);
-			if(it != neighbors.end()){
-				neighbors.erase(xy_pair);
-			}
-			neighbors[xy_pair] = &map[current->y + 1][current->x];
+			xy_pair = std::pair<int, int>(current->x, current->y + 1);
+			//cout<<"("<<xy_pair.first<<","<<xy_pair.second<<")";
+			std::pair<std::map<std::pair<int,int>,box*>::iterator, bool> insert_check  = neighbors.insert(std::pair<std::pair<int,int>,box*>(xy_pair, &(map[current->y + 1][current->x])));
+			if(insert_check.second == false){
+				//cout<<"Fail!\n";
+			}//else{cout<<"\n";}
 		}
 
-		if(check_down(current)){
+		if(check_up(current)){
 			if(map[current->y - 1][current->x].curr_dist > (map[current->y][current->x].curr_dist + 1)){
+				neighbors.erase(std::pair<int,int>(current->x, current->y - 1));
 				map[current->y - 1][current->x].curr_dist = (map[current->y][current->x].curr_dist + 1);
 				map[current->y - 1][current->x].from = current;
 			}
-			xy_pair = std::make_pair(current->x, current->y - 1);
-			it = neighbors.find(xy_pair);
-			if(it != neighbors.end()){
-				neighbors.erase(xy_pair);
-			}
-			neighbors[xy_pair] = &map[current->y - 1][current->x];
+			xy_pair = std::pair<int, int>(current->x, current->y - 1);
+			//cout<<"("<<xy_pair.first<<","<<xy_pair.second<<")";
+			std::pair<std::map<std::pair<int,int>,box*>::iterator, bool> insert_check  = neighbors.insert(std::pair<std::pair<int,int>,box*>(xy_pair, &(map[current->y - 1][current->x])));
+			if(insert_check.second == false){
+				//cout<<"Fail!\n";
+			}//else{cout<<"\n";}
 		}
 		
-		map[current->y][current->x].visited = true;
-		xy_pair = std::make_pair(current->x, current->y);
-		neighbors.erase(xy_pair);
+	}
+	
+	for(int a = 0; a < width; a++){
+		for(int b = 0; b < length; b++){
+			if(map[a][b].from != NULL){
+				map[a][b].element = '#';
+			}
+		}
 	}
 	
 	current = &(this->map[this->f_y.front()][this->f_x.front()]);
@@ -272,6 +292,14 @@ void maze::greedy(){
 
 	greedy_helper(b_lifo);
 
+	for(int a = 0; a < width; a++){
+		for(int b = 0; b < length; b++){
+			if(map[a][b].from != NULL){
+				map[a][b].element = '#';
+			}
+		}
+	}
+	
 	current = &(this->map[this->f_y.front()][this->f_x.front()]);
 	while(current->from != NULL){
 		current->element = '.';
@@ -342,7 +370,9 @@ int maze::check_right(box * current){
 	if( (this->map[current->y][current->x + 1].element != '%') ){
 		return true;
 	}else{	
+
 		this->map[current->y][current->x + 1].visited = true;
+
 	}
 
 	return false;
@@ -386,7 +416,9 @@ int maze::check_down(box * current){
 	if( (this->map[current->y + 1][current->x].element != '%') ){
 		return true;
 	}else{
+
 		this->map[current->y + 1][current->x].visited = true;
+
 	}
 
 	return false;
@@ -406,7 +438,9 @@ int maze::check_up(box * current){
 	if( (this->map[current->y - 1][current->x].element != '%') ){
 		return true;
 	}else{
+
 		this->map[current->y - 1][current->x].visited = true;
+
 	}
 
 	return false;
@@ -481,5 +515,20 @@ bool maze::astar_man_dist::operator()(const std::pair<int, int>& lhs, const std:
 	}
 	rhs_dist = rhs_y_dist + rhs_x_dist + map_copy[rhs.second][rhs.first].curr_dist;
 
+	if(rhs_dist == lhs_dist){
+		if(lhs.first == rhs.first){
+			return lhs.second < rhs.second;
+		}
+		return lhs.first > rhs.first;
+	}
+
 	return lhs_dist < rhs_dist;
 }
+
+/*
+bool maze::astar_man_dist::operator== (const std::pair<int, int>& lhs, const std::pair<int, int>& rhs){
+
+	return (lhs.first == rhs.first) && (lhs.second == rhs.second);
+
+}
+*/
