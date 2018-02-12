@@ -180,16 +180,85 @@ void maze::dfs(){
 
 void maze::astar(){
 
-	map<std::pair<int, int>,box*> neighbors; // remember to overflow comparator
-	box * current = &(map[f_y.front()][f_x.front()]);
-	std::pair<int, int> xy_pair = {f_x.front(), f_y.front()};
+	int x, y;
+	box * current = &(map[p_y.front()][p_x.front()]);
+	std::map<std::pair<int, int>, box*, astar_man_dist> neighbors (astar_man_dist(current->x, current->y, this->map)); 
+	std::pair<int, int> xy_pair(p_x.front(), p_y.front());
 	current->curr_dist = 0;
-	neighbors.insert(xy_pair, current);
+	neighbors[xy_pair] = current;
 
 	while(!neighbors.empty()){
+		cout<<"hi";
 		//call helper?
-		xy_pair = {current->x, current->y};
-		neighbors.pop(xy_pair);	
+		std::map<std::pair<int, int>, box*>::iterator it = neighbors.begin();
+		current = it->second;
+		x = it->first.first; y = it->first.second;
+		if( (x == f_x.front()) && (y == f_y.front())){
+			break;
+		}
+
+		// NOTE: check mechanism to see if something is already in map, otherwise take it out and replace it.
+		if(check_right(current)){
+			if(map[current->y][current->x + 1].curr_dist > (map[current->y][current->x].curr_dist + 1)){
+				map[current->y][current->x + 1].curr_dist = (map[current->y][current->x].curr_dist + 1);
+				map[current->y][current->x + 1].from = current;
+			}
+			xy_pair = std::make_pair(current->x+1, current->y);
+			it = neighbors.find(xy_pair);
+			if(it != neighbors.end()){
+				neighbors.erase(xy_pair);
+			}
+			neighbors[xy_pair] = &map[current->y][current->x + 1];
+		}
+
+		if(check_left(current)){
+			if(map[current->y][current->x - 1].curr_dist > (map[current->y][current->x].curr_dist + 1)){
+				map[current->y][current->x - 1].curr_dist = (map[current->y][current->x].curr_dist + 1);
+				map[current->y][current->x - 1].from = current;
+			}
+			xy_pair = std::make_pair(current->x - 1, current->y);
+			it = neighbors.find(xy_pair);
+			if(it != neighbors.end()){
+				neighbors.erase(xy_pair);
+			}
+			neighbors[xy_pair] = &map[current->y][current->x - 1];
+		}
+
+		if(check_down(current)){
+			if(map[current->y + 1][current->x].curr_dist > (map[current->y][current->x].curr_dist + 1)){
+				map[current->y + 1][current->x].curr_dist = (map[current->y][current->x].curr_dist + 1);
+				map[current->y + 1][current->x].from = current;
+			}
+			xy_pair = std::make_pair(current->x, current->y + 1);
+			it = neighbors.find(xy_pair);
+			if(it != neighbors.end()){
+				neighbors.erase(xy_pair);
+			}
+			neighbors[xy_pair] = &map[current->y + 1][current->x];
+		}
+
+		if(check_down(current)){
+			if(map[current->y - 1][current->x].curr_dist > (map[current->y][current->x].curr_dist + 1)){
+				map[current->y - 1][current->x].curr_dist = (map[current->y][current->x].curr_dist + 1);
+				map[current->y - 1][current->x].from = current;
+			}
+			xy_pair = std::make_pair(current->x, current->y - 1);
+			it = neighbors.find(xy_pair);
+			if(it != neighbors.end()){
+				neighbors.erase(xy_pair);
+			}
+			neighbors[xy_pair] = &map[current->y - 1][current->x];
+		}
+		
+		map[current->y][current->x].visited = true;
+		xy_pair = std::make_pair(current->x, current->y);
+		neighbors.erase(xy_pair);
+	}
+	
+	current = &(this->map[this->f_y.front()][this->f_x.front()]);
+	while(current->from != NULL){
+		current->element = '.';
+		current = current->from;
 	}
 
 }
@@ -272,7 +341,7 @@ int maze::check_right(box * current){
 
 	if( (this->map[current->y][current->x + 1].element != '%') ){
 		return true;
-	}else{
+	}else{	
 		this->map[current->y][current->x + 1].visited = true;
 	}
 
@@ -285,15 +354,19 @@ int maze::check_left(box * current){
 	if( (current->x - 1)< 0){
 		return false;
 	}
-	
+
+
 	if( this->map[current->y][current->x - 1].visited == true ){
 		return false;
 	}
 
+
 	if( (this->map[current->y][current->x - 1].element != '%') ){
 		return true;
 	}else{
+
 		this->map[current->y][current->x - 1].visited = true;
+
 	}
 
 	return false;
@@ -382,4 +455,31 @@ bool maze::cmp_man_dist::operator()(box * lhs, box * rhs){
 
 	return man_dist(lhs, dest) > man_dist(rhs, dest);
 	
+}
+
+/*
+* Compares 2 the manhattan distances of 2 pairs of coordinates from the destination/food.
+*/
+bool maze::astar_man_dist::operator()(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs){
+
+	// Calculate manhattan distance for lhs
+	int lhs_x_dist, lhs_y_dist, lhs_dist, rhs_dist, rhs_x_dist, rhs_y_dist;
+	if( (lhs_x_dist = lhs.first - dest_x) < 0){
+		lhs_x_dist = -lhs_x_dist;
+	}
+	if( (lhs_y_dist = lhs.second - dest_y) < 0){
+		lhs_y_dist = -lhs_y_dist;
+	}
+	lhs_dist = lhs_y_dist + lhs_x_dist + map_copy[lhs.second][lhs.first].curr_dist;
+	
+	// Calculate manhattan distance for rhs
+	if( (rhs_x_dist = rhs.first - dest_x) < 0){
+		rhs_x_dist = -rhs_x_dist;
+	}
+	if( (rhs_y_dist = rhs.second - dest_y) < 0){
+		rhs_y_dist = -rhs_y_dist;
+	}
+	rhs_dist = rhs_y_dist + rhs_x_dist + map_copy[rhs.second][rhs.first].curr_dist;
+
+	return lhs_dist < rhs_dist;
 }
