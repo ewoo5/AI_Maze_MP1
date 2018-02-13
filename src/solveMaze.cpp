@@ -31,10 +31,10 @@ int main(int argc, char* argv[])
 	inputMaze.printMaze();
 	cout<<"p_x:"<<inputMaze.p_x.front()<<'\n';
 	cout<<"p_y:"<<inputMaze.p_y.front()<<'\n';
-	cout<<"f_x:"<<inputMaze.f_x.front()<<'\n';
-	cout<<"f_y:"<<inputMaze.f_y.front()<<'\n';
+	//cout<<"f_x:"<<inputMaze.f_x.front()<<'\n';
+	//cout<<"f_y:"<<inputMaze.f_y.front()<<'\n';
 
-	inputMaze.astar();
+	inputMaze.win();
 	inputMaze.printMaze();
 
 	mazeText.close();
