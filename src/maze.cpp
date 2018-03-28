@@ -216,8 +216,8 @@ void maze::dfs(){
 
 std::vector<box*> maze::astar(){
 
-	//f_y.push_back(food_list.begin()->second);
-	//f_x.push_back(food_list.begin()->first);
+	f_y.push_back(food_list.begin()->second);
+	f_x.push_back(food_list.begin()->first);
 
 	int x, y;
 	box * current = &(map[p_y.front()][p_x.front()]);
@@ -314,7 +314,7 @@ std::vector<box*> maze::astar(){
 	while(current->from != NULL){
 		win_expanded--;
 		//path_length++;
-		//current->element = '.';
+		current->element = '.';
 		current = current->from;
 	}
 

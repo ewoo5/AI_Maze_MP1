@@ -2,8 +2,24 @@
 #include <fstream>
 #include <vector>
 #include <stack>
-#include <unordered_map>
+#include <map>
 using namespace std;
+
+class box{
+	public:
+		int x, y;
+		int man_dist, curr_dist;				
+		char element;
+		box * from;
+		int visited;
+		box(){
+			x = 0; y = 0;
+			curr_dist = 1000; man_dist = 1000;
+			element = ' ';
+			from = NULL;
+			visited = false;
+		};
+};
 
 class maze{
 
@@ -14,21 +30,7 @@ class maze{
 		int width, length; //width is delta y, and length is delta x.
 		vector<int> p_x, p_y, f_x, f_y;
 
-		class box{
-			public:
-				int x, y;
-				int man_dist, curr_dist;				
-				char element;
-				box * from;
-				int visited;
-				box(){
-					x = 0; y = 0;
-					curr_dist = 1000; man_dist = 1000;
-					element = ' ';
-					from = NULL;
-					visited = false;
-				};
-		};
+		std::map<std::pair<std::pair<int,int>,std::pair<int,int>>, std::vector<box*>> solution_map;
 
 		class couple{
 			public:
@@ -36,18 +38,21 @@ class maze{
 
 			bool operator==(const couple& argument);
 		};
+	
+		// For mulitple food (Part 1.2)
+		std::vector<std::pair<int,int>> food_list;
 
 		box ** map;
-		//std::unordered_map<couple, stack<box*>> paths_map;
 
 		void parseText(std::fstream& mazeText); //for reading and saving a maze text file.
-		//bool operator()(box * lhs, box * rhs);
-
 		void printMaze();
+		void print_solution();
+		
 		void bfs();
 		void dfs();
-		void astar();
+		std::vector<box*> astar();
 		void greedy();
+		std::vector<std::pair<int,int>> win();
 	
 		class cmp_man_dist{
 			public:
@@ -73,7 +78,18 @@ class maze{
 					dest_x = x; dest_y = y; this->map_copy = in_map;
 				}
 				bool operator()(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs);
-				//bool operator==(const std::pair<int, int>& lhs, const std::pair<int, int>& rhs);
+		};
+	
+		class win_cmp_hue{
+			public:
+				int food_num;
+				win_cmp_hue(){
+					food_num = 0;
+				}
+				win_cmp_hue(int input){
+					food_num = input;
+				}
+				bool operator()(std::pair<int,vector<std::pair<int,int>>>& lhs,  std::pair<int,vector<std::pair<int,int>>>& rhs);
 		};
 	
 	private:
@@ -83,5 +99,10 @@ class maze{
 		int check_down(box * current);
 
 		bool greedy_helper(std::stack<box*>& b_lifo);
+		
+		// for multiple food
+		bool food_is_in(std::pair<int,int>& food, std::vector<std::pair<int,int>>& current_list);
+		int insert_solution(std::pair<std::pair<int,int>,std::pair<int,int>> coord_pair);
+		void refresh();
 
 };

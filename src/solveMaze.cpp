@@ -8,12 +8,12 @@ int main(int argc, char* argv[])
 {
 	
 	if(argc != 3){
-		cout<<"Needs 2 arguments in the form: >./solveMaze <maze.txt> <search algo>\n";
+		cout<<"Needs 2 arguments in the form: >./solveMaze <maze.txt> <solution_txt>\n";
 		return 0;
 	}
 
 	fstream mazeText, solvedMaze;
-	mazeText.open(argv[1], ios::in);
+	mazeText.open(argv[1], ios::in);	
 	solvedMaze.open("solvedMaze.txt", ios::out);
 	if(!(mazeText.is_open())){
 		cout<<"Failed to open maze text file.\n";
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	//cout<<"f_x:"<<inputMaze.f_x.front()<<'\n';
 	//cout<<"f_y:"<<inputMaze.f_y.front()<<'\n';
 
-	inputMaze.win();
+	inputMaze.astar();
 	inputMaze.printMaze();
 
 	mazeText.close();
